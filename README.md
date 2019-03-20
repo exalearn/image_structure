@@ -2,7 +2,7 @@
 Python tools for structure function computation/analysis on 2d/3d images.
 
 # Example Scripts
-To see an example, run the repository as a Python package. Assuming the package is located in /path/to/topdir/image_structure, do the following:
+To see an example, run the repository as a Python package. Assuming the package is located in /path/to/topdir/image_structure, first edit the input file located in image_structure/scripts/ to reflect the filepaths on your machine. Then, do the following:
 
 cd /path/to/topdir
 
