@@ -59,14 +59,13 @@ def fit_gaussian(x,y,plot_fit=False):
     y_interp    /= np.trapz(y_interp,x_query)
     guess        = [np.max(y_interp), x_query[idx_peak] , (np.max(x)-np.min(x))/10.]
     params,uncert = opt.curve_fit(gauss1d,x_query,y_interp,p0=guess)
-    print(uncert)
     if plot_fit:
         plt.figure()
         plt.plot(x_query,y_interp)
         plt.plot(x_query, np.max(y_interp)*np.exp(-0.5*(x_query-params[1])**2/params[2]**2),'r')
         plt.legend(['Avg Fourier magnitude','Gaussian fit'])
         plt.show()
-    return params[0] , params[1]
+    return params[1] , params[2]
 
 def gauss1d(x,amp,mu,sigma):
     return amp*np.exp(-0.5*(x-mu)**2/sigma**2)
