@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+import scipy.optimize as opt
 
 def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False):
     """
@@ -55,11 +56,17 @@ def fit_gaussian(x,y,plot_fit=False):
     x_query      = np.linspace(np.min(x),np.max(x),interp_samps)
     y_interp     = np.interp(x_query,x,y)
     idx_peak     = np.argmax(y_interp)
-    sigma        = np.sqrt( np.mean( y_interp*(x_query - x_query[idx_peak])**2 ) )
+    y_interp    /= np.trapz(y_interp,x_query)
+    guess        = [np.max(y_interp), x_query[idx_peak] , (np.max(x)-np.min(x))/10.]
+    params,uncert = opt.curve_fit(gauss1d,x_query,y_interp,p0=guess)
+    print(uncert)
     if plot_fit:
         plt.figure()
         plt.plot(x_query,y_interp)
-        plt.plot(x_query, np.max(y_interp)*np.exp(-0.5*(x_query-x_query[idx_peak])**2/sigma**2),'r')
+        plt.plot(x_query, np.max(y_interp)*np.exp(-0.5*(x_query-params[1])**2/params[2]**2),'r')
         plt.legend(['Avg Fourier magnitude','Gaussian fit'])
         plt.show()
-    return x_query[idx_peak] , sigma
+    return params[0] , params[1]
+
+def gauss1d(x,amp,mu,sigma):
+    return amp*np.exp(-0.5*(x-mu)**2/sigma**2)

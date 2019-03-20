@@ -24,4 +24,4 @@ This example computes the following:
 
 (1) This software has not yet been tested on a 3d image (although it should work on one)
 
-(2) The Gaussian fit computed by the Fourier structure function fits a Gaussian centered about the peak Fourier magnitude. This is different than fitting a Gaussian to the entire spectrum, which might be important if there are nontrivial subharmonic present.
+(2) The Gaussian fit computed by the Fourier structure function fits a Gaussian to the spectrum directly, using scipy.optimize (nonlinear curve fitting). This is slightly different than enforcing that the Gaussian be centered exactly at the peak magnitude value, which might be important if there are nontrivial subharmonics present.
