@@ -11,6 +11,7 @@ class ImageStructure:
         assert ((self.dimensions == 2) | (self.dimensions == 3)) 
         self.set_input_data( self.read_input_data(inputs.data_file,inputs.data_file_type) )
         self.set_structure_function(inputs.structure_function)
+        self.outdir    = '/'.join( inputs.output_file.split('/')[0:-1] ) + '/'
 
     def set_input_data(self,data):
         self.input_data = data
@@ -36,10 +37,10 @@ class ImageStructure:
         else:
             sys.exit('Unsupported structure function type. Supported types are: fourier.')
 
-    def compute_structure(self,plot_metrics=False):
+    def compute_structure(self,plot_metrics=False,outdir=None,str_figure=None):
         """
         Main method to compute data structure
         """
-        structure = self.structure_function(self.input_data,plot_metrics)
+        structure = self.structure_function(self.input_data,plot_metrics,outdir,str_figure)
         return structure
     

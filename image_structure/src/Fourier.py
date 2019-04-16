@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 import scipy.optimize as opt
 
-def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False):
+def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False,outdir=None,str_figure=None):
     """
     Function to: 
     (1) compute the n-dimensional fourier transform of data
@@ -28,7 +28,7 @@ def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False):
         zhat      = np.fft.fftfreq(nz)*nz
         xxhat,yyhat,zzhat     = np.meshgrid(xhat,yhat,zhat)
         freq_avg,data_hat_avg = compute_radial_average_3d(xxhat,yyhat,zzhat,np.abs(data_hat))
-    gauss_mean, gauss_sigma = fit_gaussian(freq_avg,data_hat_avg,plot_metrics)
+    gauss_mean, gauss_sigma = fit_gaussian(freq_avg,data_hat_avg,plot_metrics,outdir,str_figure)
     return gauss_mean,gauss_sigma
 
 def compute_radial_average_2d(xx,yy,signal):
@@ -51,7 +51,7 @@ def compute_radial_average_3d(xx,yy,zz,signal):
         signal_avg[frequency_magnitude[i]] += signal[i]
     return np.unique(frequency_magnitude) , signal_avg
 
-def fit_gaussian(x,y,plot_fit=False):
+def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
     interp_samps = 1000
     x_query      = np.linspace(np.min(x),np.max(x),interp_samps)
     y_interp     = np.interp(x_query,x,y)
@@ -72,7 +72,9 @@ def fit_gaussian(x,y,plot_fit=False):
         plt.plot(x_query,y_interp)
         plt.plot(x_query, np.max(y_interp)*np.exp(-0.5*(x_query-params[1])**2/params[2]**2),'r')
         plt.legend(['Avg Fourier magnitude','Gaussian fit'])
-        plt.show()
+        if (outdir is not None):
+            outfile = outdir + str_figure + ".png"
+            plt.savefig(outfile, bbox_inches='tight')
     return params[1] , params[2]
 
 def gauss1d(x,amp,mu,sigma):

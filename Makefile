@@ -8,7 +8,7 @@ setup : $(DOC)
 	$(CMD) $(DOC) install
 
 script :
-	$(CMD) -m image_structure.scripts.driver image_structure/scripts/inputs.dat
+	$(CMD) -m image_structure.scripts.driver_inputfile image_structure/scripts/inputs.dat
 
 clean :
 	rm -rf build/ dist/ *egg-info

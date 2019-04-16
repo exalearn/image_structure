@@ -3,4 +3,6 @@ data_file           = /home/adegennaro/Projects/exalearn/image_structure/data/2D
 data_file_type      = npy
 structure_function  = fourier
 dimensions          = 2
-output_file         = /home/adegennaro/Projects/exalearn/image_structure/output/structure_metrics_2d
+output_file         = /home/adegennaro/Projects/exalearn/image_structure/output/structure_metrics_2d.dat
+m                   = 0.1
+sig                 = 0.5
