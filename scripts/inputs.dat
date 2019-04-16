@@ -1,6 +1,0 @@
-[CONFIG]
-data_file           = /home/adegennaro/Projects/AEOLUS/image_structure/data/signal_gaussian_2d.npy
-data_file_type      = npy
-structure_function  = fourier
-dimensions          = 2
-output_file         = /home/adegennaro/Projects/AEOLUS/image_structure/scripts/structure_metrics_2d

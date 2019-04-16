@@ -1,0 +1,6 @@
+[CONFIG]
+data_file           = /home/adegennaro/Projects/exalearn/image_structure/data/signal_gaussian_2d.npy
+data_file_type      = npy
+structure_function  = fourier
+dimensions          = 2
+output_file         = /home/adegennaro/Projects/exalearn/image_structure/output/structure_metrics_2d
