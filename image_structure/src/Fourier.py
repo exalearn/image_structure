@@ -58,7 +58,15 @@ def fit_gaussian(x,y,plot_fit=False):
     idx_peak     = np.argmax(y_interp)
     y_interp    /= np.trapz(y_interp,x_query)
     guess        = [np.max(y_interp), x_query[idx_peak] , (np.max(x)-np.min(x))/10.]
-    params,uncert = opt.curve_fit(gauss1d,x_query,y_interp,p0=guess)
+    try:
+        params,uncert = opt.curve_fit(gauss1d,x_query,y_interp,p0=guess)
+    except:
+        # Reflect to negative k-space for full gaussian fitting
+        x_reflect     = np.hstack( [-x_query[::-1] , x_query] )
+        y_reflect     = np.hstack( [y_interp[::-1] , y_interp] )
+        params,uncert = opt.curve_fit(gauss1d,x_reflect,y_reflect,p0=guess)
+    params[1] = np.maximum( params[1] , 0 ) # Limiter on mean
+    params[2] = np.maximum( params[2] , 0 ) # Limiter on std-dev
     if plot_fit:
         plt.figure()
         plt.plot(x_query,y_interp)
