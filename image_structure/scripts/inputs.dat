@@ -1,5 +1,5 @@
 [CONFIG]
-data_file           = /home/adegennaro/Projects/exalearn/image_structure/data/2D_N100_T2000_sig0.5_m0.1_size8_gray.npy
+data_file           = /home/adegennaro/Projects/exalearn/image_structure/data/2D_N100_T2000_sig29.0_m0.5_size8_gray.npy
 data_file_type      = npy
 structure_function  = fourier
 dimensions          = 2

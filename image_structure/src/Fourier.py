@@ -54,6 +54,7 @@ def compute_radial_average_3d(xx,yy,zz,signal):
 def find_nontrivial_maximum(y):
     # Ignore the zero'th fourier coefficient in finding a maximum
     if (np.argmax(y) == 0):
+        print('Fix')
         return np.argmax(y[1:])
     else:
         return np.argmax(y)
@@ -71,6 +72,7 @@ def restrict_x_data(x,y,decay):
 def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
     interp_samps = 1000  # Number of interpolation upsamples
     d            = 0.2   # Decay parameter for gaussian fitting    
+    x = x[1:]; y = y[1:]; # Throw away the zero-th order fourier wavenumber
     
     x_query      = np.linspace(np.min(x),np.max(x),interp_samps)
     y_interp     = np.interp(x_query,x,y)
