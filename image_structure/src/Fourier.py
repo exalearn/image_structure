@@ -86,7 +86,7 @@ def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
     except:
         x_fitting,y_fitting = restrict_x_data(x_reflect,y_reflect,d*0.5)
         guess               = [np.max(y_fitting), x_query[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
-        params,uncert       = opt.curve_fit(gauss1d,x_reflect,y_reflect,p0=guess)
+        params,uncert       = opt.curve_fit(gauss1d,x_fitting,y_fitting,p0=guess)
     params[1] = np.maximum( params[1] , 0 ) # Limiter on mean
     params[2] = np.maximum( params[2] , 0 ) # Limiter on std-dev
     
