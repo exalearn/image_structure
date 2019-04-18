@@ -51,22 +51,45 @@ def compute_radial_average_3d(xx,yy,zz,signal):
         signal_avg[frequency_magnitude[i]] += signal[i]
     return np.unique(frequency_magnitude) , signal_avg
 
+def find_nontrivial_maximum(y):
+    # Ignore the zero'th fourier coefficient in finding a maximum
+    if (np.argmax(y) == 0):
+        return np.argmax(y[1:])
+    else:
+        return np.argmax(y)
+
+def return_peak_centered_spectrum(x,y,idx_peak):
+    # Reflect (x,y) about idx_peak
+    x_reflect  = np.hstack( [-np.flipud(x[idx_peak+1:]) + 2*x[idx_peak] , x[idx_peak:]] )
+    y_reflect  = np.hstack( [ np.flipud(y[idx_peak+1:])                 , y[idx_peak:]] )
+    return x_reflect,y_reflect
+
+def restrict_x_data(x,y,decay):
+    # Chop-off everything that has decayed past decay*max(y)
+    return x[y >= decay*np.max(y)] , y[y >= decay*np.max(y)]
+    
 def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
-    interp_samps = 1000
+    interp_samps = 1000  # Number of interpolation upsamples
+    d            = 0.2   # Decay parameter for gaussian fitting    
+    
     x_query      = np.linspace(np.min(x),np.max(x),interp_samps)
     y_interp     = np.interp(x_query,x,y)
-    idx_peak     = np.argmax(y_interp)
+    idx_peak     = find_nontrivial_maximum( y_interp )
     y_interp    /= np.trapz(y_interp,x_query)
-    guess        = [np.max(y_interp), x_query[idx_peak] , (np.max(x)-np.min(x))/10.]
+    
+    # Force mean of gaussian to be at peak and reflect x-axis about the peak for fitting
+    x_reflect,y_reflect = return_peak_centered_spectrum(x_query, y_interp, idx_peak)
+    x_fitting,y_fitting = restrict_x_data(x_reflect,y_reflect,d)
+    guess               = [np.max(y_fitting), x_query[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
     try:
-        params,uncert = opt.curve_fit(gauss1d,x_query,y_interp,p0=guess)
+        params,uncert       = opt.curve_fit(gauss1d,x_fitting,y_fitting,p0=guess)
     except:
-        # Reflect to negative k-space for full gaussian fitting
-        x_reflect     = np.hstack( [-x_query[::-1] , x_query] )
-        y_reflect     = np.hstack( [y_interp[::-1] , y_interp] )
-        params,uncert = opt.curve_fit(gauss1d,x_reflect,y_reflect,p0=guess)
+        x_fitting,y_fitting = restrict_x_data(x_reflect,y_reflect,d*0.5)
+        guess               = [np.max(y_fitting), x_query[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
+        params,uncert       = opt.curve_fit(gauss1d,x_reflect,y_reflect,p0=guess)
     params[1] = np.maximum( params[1] , 0 ) # Limiter on mean
     params[2] = np.maximum( params[2] , 0 ) # Limiter on std-dev
+    
     if plot_fit:
         plt.figure()
         plt.plot(x_query,y_interp)
