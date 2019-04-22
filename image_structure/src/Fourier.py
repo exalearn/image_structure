@@ -70,14 +70,6 @@ def compute_radial_average_3d(xx,yy,zz,signal):
         signal_avg[frequency_magnitude[i]] += signal[i]
     return np.unique(frequency_magnitude) , signal_avg
 
-def find_nontrivial_maximum(y):
-    # Ignore the zero'th fourier coefficient in finding a maximum
-    if (np.argmax(y) == 0):
-        print('Fix')
-        return np.argmax(y[1:])
-    else:
-        return np.argmax(y)
-
 def return_peak_centered_spectrum(x,y,idx_peak):
     # Reflect (x,y) about idx_peak
     x_reflect  = np.hstack( [-np.flipud(x[idx_peak+1:]) + 2*x[idx_peak] , x[idx_peak:]] )
@@ -89,14 +81,13 @@ def restrict_x_data(x,y,decay):
     return x[y >= decay*np.max(y)] , y[y >= decay*np.max(y)]
     
 def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
-    interp_samps = 1000  # Number of interpolation upsamples
-    d            = 0.2   # Decay parameter for gaussian fitting    
-    x = x[1:]; y = y[1:]; # Throw away the zero-th order fourier wavenumber
+    interp_samps = len(y)    # Number of interpolation upsamples
+    d            = 0.2       # Decay parameter for gaussian fitting    
+    x = x[1:]; y = y[1:];    # Throw away the zero-th order fourier wavenumber
     
     x_query      = np.linspace(np.min(x),np.max(x),interp_samps)
-    y_interp     = np.interp(x_query,x,y)
-    idx_peak     = find_nontrivial_maximum( y_interp )
-    y_interp    /= np.trapz(y_interp,x_query)
+    y_interp     = np.interp( x_query,x,y )
+    idx_peak     = np.argmax( y_interp )
     
     # Force mean of gaussian to be at peak and reflect x-axis about the peak for fitting
     x_reflect,y_reflect = return_peak_centered_spectrum(x_query, y_interp, idx_peak)
