@@ -34,12 +34,28 @@ def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False,outdir=None
 def compute_radial_average_2d(xx,yy,signal):
     assert( (xx.shape == yy.shape) & (xx.shape == signal.shape) )
     nx,ny               = xx.shape
-    frequency_magnitude = np.sqrt( xx**2 + yy**2 ).ravel().astype(int)
-    signal_avg          = np.zeros((frequency_magnitude.max()-frequency_magnitude.min())+1)
-    signal              = signal.ravel()
-    for i in range(len(frequency_magnitude)):
-        signal_avg[frequency_magnitude[i]] += signal[i]
-    return np.unique(frequency_magnitude) , signal_avg
+    frequency_magnitude = np.sqrt( xx**2 + yy**2 ).ravel()
+    idx_freq            = np.argsort( frequency_magnitude )
+    frequency_magnitude = frequency_magnitude[idx_freq]
+    signal              = (signal.ravel())[idx_freq]
+    f_unique            = np.unique( frequency_magnitude )
+    idx_start           = 0
+    signal_avg          = np.zeros( len(f_unique) )
+    for i in range(len(f_unique)):
+        count = 0
+        while(True):
+            count += 1
+            if ((idx_start+count) == len(frequency_magnitude)):
+                idx_end = len(frequency_magnitude)
+                break
+            else:
+                if not np.isclose(frequency_magnitude[idx_start+count],f_unique[i]):
+                    idx_end = idx_start+count
+                    break
+        signal_avg[i] = np.mean( signal[idx_start:idx_end] )
+        idx_start     = idx_end
+    plt.plot(f_unique,signal_avg); plt.show()
+    return f_unique , signal_avg
 
 def compute_radial_average_3d(xx,yy,zz,signal):
     assert( (xx.shape == yy.shape) & (xx.shape == zz.shape) & (xx.shape == signal.shape) )
