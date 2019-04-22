@@ -31,6 +31,25 @@ def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False,outdir=None
     gauss_mean, gauss_sigma = fit_gaussian(freq_avg,data_hat_avg,plot_metrics,outdir,str_figure)
     return gauss_mean,gauss_sigma
 
+def compute_yavg_over_unique_xvals(x,y):
+    x_unique   = np.unique( x )
+    y_avg      = np.zeros_like( x_unique )
+    idx_start  = 0
+    for i in range(len(x_unique)):
+        count = 0
+        while(True):
+            count += 1
+            if ((idx_start+count) == len(x)):
+                idx_end = len(x)
+                break
+            else:
+                if not np.isclose(x[idx_start+count],x_unique[i]):
+                    idx_end = idx_start+count
+                    break
+        y_avg[i]    = np.mean( y[idx_start:idx_end] )
+        idx_start   = idx_end
+    return x_unique,y_avg
+
 def compute_radial_average_2d(xx,yy,signal):
     assert( (xx.shape == yy.shape) & (xx.shape == signal.shape) )
     nx,ny               = xx.shape
@@ -38,22 +57,7 @@ def compute_radial_average_2d(xx,yy,signal):
     idx_freq            = np.argsort( frequency_magnitude )
     frequency_magnitude = frequency_magnitude[idx_freq]
     signal              = (signal.ravel())[idx_freq]
-    f_unique            = np.unique( frequency_magnitude )
-    idx_start           = 0
-    signal_avg          = np.zeros( len(f_unique) )
-    for i in range(len(f_unique)):
-        count = 0
-        while(True):
-            count += 1
-            if ((idx_start+count) == len(frequency_magnitude)):
-                idx_end = len(frequency_magnitude)
-                break
-            else:
-                if not np.isclose(frequency_magnitude[idx_start+count],f_unique[i]):
-                    idx_end = idx_start+count
-                    break
-        signal_avg[i] = np.mean( signal[idx_start:idx_end] )
-        idx_start     = idx_end
+    f_unique,signal_avg = compute_yavg_over_unique_xvals( frequency_magnitude, signal)    
     return f_unique , signal_avg
 
 def compute_radial_average_3d(xx,yy,zz,signal):
