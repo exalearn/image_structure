@@ -81,34 +81,30 @@ def restrict_x_data(x,y,decay):
     return x[y >= decay*np.max(y)] , y[y >= decay*np.max(y)]
     
 def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
-    interp_samps = len(y)    # Number of interpolation upsamples
     d            = 0.2       # Decay parameter for gaussian fitting    
     x = x[1:]; y = y[1:];    # Throw away the zero-th order fourier wavenumber
-    
-    x_query      = np.linspace(np.min(x),np.max(x),interp_samps)
-    y_interp     = np.interp( x_query,x,y )
-    idx_peak     = np.argmax( y_interp )
-    
+        
     # Force mean of gaussian to be at peak and reflect x-axis about the peak for fitting
-    x_reflect,y_reflect = return_peak_centered_spectrum(x_query, y_interp, idx_peak)
+    idx_peak            = np.argmax( y )
+    x_reflect,y_reflect = return_peak_centered_spectrum(x, y, idx_peak)
     x_fitting,y_fitting = restrict_x_data(x_reflect,y_reflect,d)
-    guess               = [np.max(y_fitting), x_query[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
+    guess               = [np.max(y_fitting), x[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
     try:
         params,uncert       = opt.curve_fit(gauss1d,x_fitting,y_fitting,p0=guess)
     except:
         x_fitting,y_fitting = restrict_x_data(x_reflect,y_reflect,d*0.5)
-        guess               = [np.max(y_fitting), x_query[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
+        guess               = [np.max(y_fitting), x[idx_peak] , (np.max(x_fitting)-np.min(x_fitting))/5.]
         params,uncert       = opt.curve_fit(gauss1d,x_fitting,y_fitting,p0=guess)
     params[1] = np.maximum( params[1] , 0 ) # Limiter on mean
     params[2] = np.maximum( params[2] , 0 ) # Limiter on std-dev
     
     if plot_fit:
         plt.figure()
-        fit   = np.max(y_interp)*np.exp(-0.5*(x_query-params[1])**2/params[2]**2)
-        x_fit = x_query[ fit > np.max(y_interp)*np.exp(-0.5*(20**2)) ]
-        y_fit = y_interp[ fit > np.max(y_interp)*np.exp(-0.5*(20**2)) ]
+        fit   = np.max(y)*np.exp(-0.5*(x-params[1])**2/params[2]**2)
+        x_fit = x[ fit > np.max(y)*np.exp(-0.5*(20**2)) ]
+        y_fit = y[ fit > np.max(y)*np.exp(-0.5*(20**2)) ]
         plt.plot(x_fit,y_fit,'b',linewidth=3)
-        plt.plot(x_fit, np.max(y_interp)*np.exp(-0.5*(x_fit-params[1])**2/params[2]**2),'r',linewidth=3)
+        plt.plot(x_fit, np.max(y)*np.exp(-0.5*(x_fit-params[1])**2/params[2]**2),'r',linewidth=3)
         plt.xlabel(r'$|k|$',fontsize=20)
         plt.legend(['Avg Fourier magnitude','Gaussian fit'])
         if (outdir is not None):
