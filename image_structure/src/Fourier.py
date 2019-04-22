@@ -54,7 +54,6 @@ def compute_radial_average_2d(xx,yy,signal):
                     break
         signal_avg[i] = np.mean( signal[idx_start:idx_end] )
         idx_start     = idx_end
-    plt.plot(f_unique,signal_avg); plt.show()
     return f_unique , signal_avg
 
 def compute_radial_average_3d(xx,yy,zz,signal):
@@ -110,8 +109,12 @@ def fit_gaussian(x,y,plot_fit=False,outdir=None,str_figure=None):
     
     if plot_fit:
         plt.figure()
-        plt.plot(x_query,y_interp)
-        plt.plot(x_query, np.max(y_interp)*np.exp(-0.5*(x_query-params[1])**2/params[2]**2),'r')
+        fit   = np.max(y_interp)*np.exp(-0.5*(x_query-params[1])**2/params[2]**2)
+        x_fit = x_query[ fit > np.max(y_interp)*np.exp(-0.5*(20**2)) ]
+        y_fit = y_interp[ fit > np.max(y_interp)*np.exp(-0.5*(20**2)) ]
+        plt.plot(x_fit,y_fit,'b',linewidth=3)
+        plt.plot(x_fit, np.max(y_interp)*np.exp(-0.5*(x_fit-params[1])**2/params[2]**2),'r',linewidth=3)
+        plt.xlabel(r'$|k|$',fontsize=20)
         plt.legend(['Avg Fourier magnitude','Gaussian fit'])
         if (outdir is not None):
             outfile = outdir + str_figure + ".png"
