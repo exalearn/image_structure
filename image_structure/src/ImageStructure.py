@@ -1,6 +1,7 @@
 import numpy as np
 from image_structure.src.Fourier import *
 from image_structure.src.YagerFourier import *
+import sys
 
 class ImageStructure:
 
@@ -9,11 +10,32 @@ class ImageStructure:
         Light wrapper class for image structure functions
         """
         self.dimensions = int(inputs.dimensions)
-        assert ((self.dimensions == 2) | (self.dimensions == 3)) 
-        self.set_input_data( self.read_input_data(inputs.data_file,inputs.data_file_type) )
+        assert ((self.dimensions == 2) | (self.dimensions == 3))
+        input_data = self.read_input_data(inputs.data_file,inputs.data_file_type)
+        try:
+            fields = list(vars(inputs))
+        except:
+            fields = inputs._fields
+        shape_data = len(np.shape(input_data))
+        if ( ('nx' in fields) & (shape_data == 1) ):
+            input_data  = self.reshape_input_data( input_data , inputs )
+        elif ( ('nx' not in fields) & (shape_data == 1) ):
+            sys.exit('1d data detected; please specify nx,ny or nx,ny,nz')
+        self.set_input_data( input_data )
         self.set_structure_function(inputs.structure_function)
         self.outdir    = '/'.join( inputs.output_file.split('/')[0:-1] ) + '/'
 
+    def reshape_input_data(self,data,inputs):
+        # Reshape if given 1D raveled data
+        try:
+            if (self.dimensions == 2):
+                input_data = np.reshape( data , [inputs.nx , inputs.ny] )
+            elif (self.dimensions == 3):
+                input_data = np.reshape( data , [inputs.nx , inputs.ny , inputs.nz] )
+            return input_data
+        except:
+            sys.exit('1d data detected; please specify nx,ny or nx,ny,nz')
+        
     def set_input_data(self,data):
         self.input_data = data
         
@@ -24,9 +46,13 @@ class ImageStructure:
         if (data_file_type == 'npy'):
             input_data = np.load(data_file)
         elif (data_file_type == 'csv'):
-            input_data = np.loadtxt(data_file,delimiter=',')
+            try:
+                input_data = np.loadtxt(data_file,delimiter=',')
+            except:
+                input_data = np.genfromtxt( data_file )
         else:
             sys.exit('Unsupported input data type. Supported types are: npy and csv.')
+
         return input_data
 
     def set_structure_function(self,structure_function_type):
