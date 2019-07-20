@@ -6,21 +6,6 @@ from image_structure.src.Fourier import *
 from image_structure.src.InputFile import *
 
 def main():
-    """
-    Example driver script for computing the structure function based on Fourier analysis.
-
-    **Inputs**
-
-    ----------
-    args : command line arguments
-        Command line arguments used in shell call for this main driver script. args must have a inputfilename member that specifies the desired inputfile name.
-
-    **Outputs**
-
-    -------
-    inputs.outdir/results.txt : csv file
-        output structure metrics. In the Fourier case, this is (mean, sigma) of the Gaussian fit to the average Fourier magnitude
-    """
 
     # Problem setup: read input file options
     parser  = argparse.ArgumentParser(description='Input filename');
@@ -33,7 +18,7 @@ def main():
 
     # Compute structure function
     outdir             = '/'.join( inputs.output_file.split('/')[0:-1] ) + '/'
-    str_figure         = '_'.join( ['m' + str(inputs.m) , 'sig' + str(inputs.sig)] )
+    str_figure         = 'script_output'
     structure_analysis = ImageStructure(inputs)
     structure_metrics  = structure_analysis.compute_structure(plot_metrics=True, outdir=outdir, str_figure=str_figure)
 

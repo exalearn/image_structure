@@ -26,8 +26,6 @@ class InputFile():
     dimensions                      int           - Number of physical dimensions of data.
                                                   - Supported options: 2, 3.
     output_file                     string        - Full path to output file name (without datatype extension)
-    m                               float         - Parameter (TODO: Ai needs to describe this)
-    sig                             float         - Parameter (TODO: Ai needs to describe this)
     ==============================  ============  ===============================================
     """
 
@@ -61,8 +59,6 @@ class InputFile():
 
     def convert_strings_to_appropriate_datatypes(self):
         self.dimensions = int(self.dimensions)
-        self.m          = float(self.m)
-        self.sig        = float(self.sig)
         
     def set_necessary_keys(self):
         # Set list defining necessary keys for training

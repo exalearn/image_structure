@@ -3,32 +3,32 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 import scipy.optimize as opt
 
-def fit_gaussian_to_average_fourier_spectrum(data,plot_metrics=False,outdir=None,str_figure=None):
+def fit_gaussian_to_average_fourier_spectrum(input_data,plot_metrics=False,output_dir=None,output_name=None):
     """
     Function to: 
-    (1) compute the n-dimensional fourier transform of data
+    (1) compute the n-dimensional fourier transform of input_data
     (2) compute the 1-d average of this
     (3) fit gaussian to the peak
     return this gaussian fit
     """
-    assert( (data.ndim == 2) | (data.ndim == 3) )
-    data_hat    = np.fft.fftn(data)
-    if (data.ndim == 2):
-        nx,ny        = data.shape
+    assert( (input_data.ndim == 2) | (input_data.ndim == 3) )
+    data_hat    = np.fft.fftn(input_data)
+    if (input_data.ndim == 2):
+        nx,ny        = input_data.shape
         data_hat    *= (1./nx/ny)
         xhat         = np.fft.fftfreq(nx)*nx
         yhat         = np.fft.fftfreq(ny)*ny
         xxhat,yyhat  = np.meshgrid(xhat,yhat)
         freq_avg,data_hat_avg = compute_radial_average_2d(xxhat,yyhat,np.abs(data_hat))
-    elif (data.ndim == 3):
-        nx,ny,nz  = data.shape
+    elif (input_data.ndim == 3):
+        nx,ny,nz  = input_data.shape
         data_hat *= (1./nx/ny/nz)
         xhat      = np.fft.fftfreq(nx)*nx
         yhat      = np.fft.fftfreq(ny)*ny
         zhat      = np.fft.fftfreq(nz)*nz
         xxhat,yyhat,zzhat     = np.meshgrid(xhat,yhat,zhat)
         freq_avg,data_hat_avg = compute_radial_average_3d(xxhat,yyhat,zzhat,np.abs(data_hat))
-    gauss_mean, gauss_sigma = fit_gaussian(freq_avg,data_hat_avg,plot_metrics,outdir,str_figure)
+    gauss_mean, gauss_sigma = fit_gaussian(freq_avg,data_hat_avg,plot_metrics,output_dir,output_name)
     return gauss_mean,gauss_sigma
 
 def compute_yavg_over_unique_xvals(x,y):

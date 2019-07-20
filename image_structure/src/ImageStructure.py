@@ -1,5 +1,6 @@
 import numpy as np
 from image_structure.src.Fourier import *
+from image_structure.src.YagerFourier import *
 
 class ImageStructure:
 
@@ -34,13 +35,18 @@ class ImageStructure:
         """
         if (structure_function_type == 'fourier'):
             self.structure_function = fit_gaussian_to_average_fourier_spectrum
+        elif (structure_function_type == 'fourier_yager'):
+            self.structure_function = structure_vector_yager_2d
         else:
-            sys.exit('Unsupported structure function type. Supported types are: fourier.')
+            sys.exit('Unsupported structure function type. Supported types are: fourier , fourier_yager.')
 
     def compute_structure(self,plot_metrics=False,outdir=None,str_figure=None):
         """
         Main method to compute data structure
         """
-        structure = self.structure_function(self.input_data,plot_metrics,outdir,str_figure)
+        structure = self.structure_function(input_data   = self.input_data , \
+                                            plot_metrics = plot_metrics , \
+                                            output_dir   = outdir , \
+                                            output_name  = str_figure )
         return structure
     

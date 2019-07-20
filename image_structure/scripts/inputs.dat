@@ -1,8 +1,6 @@
 [CONFIG]
 data_file           = /home/adegennaro/Projects/exalearn/image_structure/data/2D_N100_T2000_sig0.5_m0.1_size8_gray.npy
 data_file_type      = npy
-structure_function  = fourier
+structure_function  = fourier_yager
 dimensions          = 2
 output_file         = /home/adegennaro/Projects/exalearn/image_structure/output/structure_metrics_2d.dat
-m                   = 0.1
-sig                 = 0.5
