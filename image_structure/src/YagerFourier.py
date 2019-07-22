@@ -225,10 +225,8 @@ def peak_fit(xs, ys, x_expected, range_rel=0.2, vary=True, eps=1e-10):
         
     return lm_result, fit_line, fit_line_extended
         
-    
-    
-def structure_vector_yager_2d(input_data, plot_metrics=True, output_dir='./', output_name='result', range_rel=0.75, scale=[1,1], adjust=1.0, output_condition=''):
-
+def fft_circavg_yager_2d(input_data, plot_metrics=True, output_dir='./', output_name='result',
+                         range_rel=0.75, scale=[1,1], adjust=1.0, output_condition='' , interpolation_abscissa = None ):
     assert( input_data.ndim == 2 )
     
     x_scale, y_scale = scale
@@ -257,27 +255,47 @@ def structure_vector_yager_2d(input_data, plot_metrics=True, output_dir='./', ou
     # Optionally adjust the curve to improve data extraction
     if adjust is not None:
         data1D *= np.power(qs, adjust)
-        
-    
+
+    # Optionally interpolate
+    if interpolation_abscissa is not None:
+        assert( (interpolation_abscissa[0] >= qs[0]) & (interpolation_abscissa[-1] <= qs[-1]) )
+        data1D = np.interp( interpolation_abscissa , qs , data1D )
+        qs     = interpolation_abscissa
+
     # Find the peak of the data
     idx = np.where( data1D==np.max(data1D) )[0][0]
     idx = max(idx, 3)
     xpeak, ypeak = qs[idx], data1D[idx]
-    
+
     # Fit the 1D curve to a Gaussian
     lm_result, fit_line, fit_line_extended = peak_fit(qs, data1D, x_expected=xpeak, range_rel=range_rel)
 
+    if plot_metrics:
+        plot1DFFT(qs, data1D, outfile='{}{}1DFFT_{}.png'.format(output_dir, output_name, output_condition), x_expected=xpeak, range_rel=range_rel, fit_line=fit_line, fit_line_e=fit_line_extended, fit_result=lm_result)
+
+    # Save structure vector to output_dir
+    np.savetxt( output_dir + output_name + 'fft_circavg.out' , [qs , data1D] )
+    
+    return qs , data1D , lm_result
+
+    
+def structure_vector_yager_2d(input_data, plot_metrics=True, output_dir='./', output_name='result',
+                              range_rel=0.75, scale=[1,1], adjust=1.0, output_condition='', interpolation_abscissa=None):
+
+    assert( input_data.ndim == 2 )
+    
+    qs , data1D , lm_result = fft_circavg_yager_2d(input_data, plot_metrics, output_dir, output_name,
+                                                   range_rel, scale, adjust, output_condition, interpolation_abscissa)
+    
     p = lm_result.params['prefactor'].value # Peak height (prefactor)
     q = lm_result.params['x_center'].value # Peak position (center)
     sigma = lm_result.params['sigma'].value # Peak width (stdev)
     I = p*sigma*np.sqrt(2*np.pi) # Integrated peak area
     m = lm_result.params['m'].value # Baseline slope
     b = lm_result.params['b'].value # Baseline intercept
-    
-    
-    if plot_metrics:
-        plot1DFFT(qs, data1D, outfile='{}{}1DFFT_{}.png'.format(output_dir, output_name, output_condition), x_expected=xpeak, range_rel=range_rel, fit_line=fit_line, fit_line_e=fit_line_extended, fit_result=lm_result)
-    
+
+    # Save structure vector to output_dir
+    np.savetxt( output_dir + output_name + 'structure_vector.out' , [p, q, sigma, I, m, b] )
 
     return p, q, sigma, I, m, b
 

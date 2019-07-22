@@ -63,16 +63,19 @@ class ImageStructure:
             self.structure_function = fit_gaussian_to_average_fourier_spectrum
         elif (structure_function_type == 'fourier_yager'):
             self.structure_function = structure_vector_yager_2d
+        elif (structure_function_type == 'fourier_yager_full'):
+            self.structure_function = fft_circavg_yager_2d
         else:
-            sys.exit('Unsupported structure function type. Supported types are: fourier , fourier_yager.')
+            sys.exit('Unsupported structure function type. Supported types are: fourier , fourier_yager , fourier_yager_full.')
 
-    def compute_structure(self,plot_metrics=False,outdir=None,str_figure=None):
+    def compute_structure(self,plot_metrics=False,outdir=None,str_figure=None,interpolation_abscissa=None):
         """
         Main method to compute data structure
         """
         structure = self.structure_function(input_data   = self.input_data , \
                                             plot_metrics = plot_metrics , \
                                             output_dir   = outdir , \
-                                            output_name  = str_figure )
+                                            output_name  = str_figure , \
+                                            interpolation_abscissa = interpolation_abscissa )
         return structure
     

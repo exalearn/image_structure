@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 import scipy.optimize as opt
 
-def fit_gaussian_to_average_fourier_spectrum(input_data,plot_metrics=False,output_dir=None,output_name=None):
+def fit_gaussian_to_average_fourier_spectrum(input_data,plot_metrics=False,output_dir=None,output_name=None,interpolation_abscissa=None):
     """
     Function to: 
     (1) compute the n-dimensional fourier transform of input_data
