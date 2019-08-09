@@ -11,7 +11,10 @@ class ImageStructure:
         """
         self.dimensions = int(inputs.dimensions)
         assert ((self.dimensions == 2) | (self.dimensions == 3))
-        input_data = self.read_input_data(inputs.data_file,inputs.data_file_type)
+        if "data_file" in inputs:
+            input_data = self.read_input_data(inputs.data_file,inputs.data_file_type)
+        else:
+            input_data = inputs.data
         try:
             fields = list(vars(inputs))
         except:
