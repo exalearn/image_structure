@@ -182,7 +182,13 @@ def peak_fit(xs, ys, x_expected, range_rel=0.2, vary=True, eps=1e-10):
 
     # Trim the curve to extract just the part we want
     xi, xf = x_expected*(1-range_rel), x_expected*(1+range_rel)
-    idx_start, idx_end = np.where( xs>xi )[0][0], np.where( xs>xf )[0][0]
+
+    if (xf > max(xs)): # Ai added this part to avoid an error
+        xf = max(xs)
+        idx_start, idx_end = np.where( xs>xi )[0][0], np.where( xs>=xf )[0][0]
+    else:
+        idx_start, idx_end = np.where( xs>xi )[0][0], np.where( xs>xf )[0][0]
+
     xc = xs[idx_start:idx_end]
     yc = ys[idx_start:idx_end]
     span = np.max(xc)-np.min(xc)
